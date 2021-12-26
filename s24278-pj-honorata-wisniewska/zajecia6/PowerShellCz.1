@@ -1,0 +1,213 @@
+1. Uruchomilam powloke PowerSell z uprawnieniami administratora, aby zmienic ExecutionPolicy z Restricted na Bypass.
+Pozwala to na uruchamianie skrytpów w Powershell bez dodatkowych pytan, czy ostrzezen. Opcja Unrestricted dziala podobnie jak Bypass, ale z dodatkowymi ostrzezeniami.
+Wrocilam do PowerShella bez uprawnien administratora, aby nie ryzykowac wykonaniem skryptu, ktory moglby uszkodzic lub odinstalowac istotne rzeczy na dysku.
+
+PS C:\Users\honwi> Set-ExecutionPolicy Bypass
+PS C:\Users\honwi> Get-ExecutionPolicy // Polecenie pokazuje aktualne ExecutionPolicy
+Bypass
+
+Moglam tez sprawdzic swoja wersje PowerShell poleceniem $PSVersionTable
+PS C:\Users\honwi> $PSVersionTable
+
+Name                           Value                                                                                                                                     
+----                           -----                 
+PSVersion                      5.1.19041.1320                                                                                                                            
+PSEdition                      Desktop                                                                                                                                   
+PSCompatibleVersions           {1.0, 2.0, 3.0, 4.0...}     
+BuildVersion                   10.0.19041.1320                                                                                                                           
+CLRVersion                     4.0.30319.42000        
+WSManStackVersion              3.0                                                                                                                                       
+PSRemotingProtocolVersion      2.3                                                                                                                                       
+SerializationVersion           1.1.0.1
+
+2. Sprawdzilam w jaki sposob moge uzyskac pomoc z poleceniami polececeniem Get-Help.
+
+PS C:\Users\honwi> Get-Help Get-ExecutionPolicy
+
+NAME
+    Get-ExecutionPolicy
+    
+SYNTAX
+    Get-ExecutionPolicy [[-Scope] {Process | CurrentUser | LocalMachine | UserPolicy | MachinePolicy}] [-List]  [<CommonParameters>]
+...
+
+Na moim komputerze nie byly zainstalowane pliki Help. Aby je zainstalowac musialam uruchomic polecenie Update-Help, ale tylko znowu w powloce z uprawnieniami administratora.
+
+REMARKS
+    Get-Help cannot find the Help files for this cmdlet on this computer. It is displaying only partial help.
+        -- To download and install Help files for the module that includes this cmdlet, use Update-Help.
+        -- To view the Help topic for this cmdlet online, type: "Get-Help Get-ChildItem -Online" or 
+           go to https://go.microsoft.com/fwlink/?LinkID=113308.
+
+Po zainstalowaniu plikow polecenie Get-Help dziala bez zarzutow.
+
+PS C:\Users\honwi> Get-Help Get-ExecutionPolicy
+...
+DESCRIPTION
+    To display the execution policies for each scope in the order of precedence, use `Get-ExecutionPolicy -List`. To see the effective execution policy for your PowerShell session use 
+    `Get-ExecutionPolicy` with no parameters.
+  
+    The effective execution policy is determined by execution policies that are set by `Set-ExecutionPolicy` and Group Policy settings.
+    
+    For more information, see about_Execution_Policies (../Microsoft.PowerShell.Core/about/about_Execution_Policies.md)
+...
+
+Sprawdzilam rowniez przyklady uzycia.
+PS C:\Users\honwi> Get-Help Get-ExecutionPolicy -Examples
+
+3.Komendy PowerShell maja stala konwencje nazewnicza: Czasownik-NaCzymMaOperowac. Mozna je wylistowac poleceniem:
+PS C:\Users\honwi> Get-Module -ListAvailable
+Lista pokazuje konkretne moduly i polecenia jakie mozna uzyc do tych modulow.
+
+Istnieje mozliwość wyszukania (przefiltrowania) listy za pomoca polecenia "Where-Object" lub jego skrotu "?".
+
+PS C:\Users\honwi>  Get-Module -ListAvailable | ? {$_.Version -ge "2.0.0.0"}
+Uzylam powyzszego polecenia, aby przefiltrowac liste w poszukiwaniu modulow wersji powyzej 2.0.0.0. Potok (pipeline) "|" uruchamia kolejne polecenie na danych wyjsciowych z poprzedniego polecenia.
+
+W kolumnie ExportedCommands sa zapisane polecenia, ktore obsluguja dane moduly.
+Mozna wydobyc liste polecen dostepnych w tych modulach za pomoca polecenia "Where-Object" lub jego skrotu "%" (inaczej petla).
+PS C:\Users\honwi> Get-Module -ListAvailable | ? {$_.Version -ge "2.0.0.0"} | % {Get-Command -Module $_.Name}
+Pojawia sie bardzo dluga lista z poleceniami.
+
+Dodajac kolejne pipeliny do polecenia mozna dowolnie modyfikowac otrzymana zawartosc:
+
+| ?{($_.Name -like "Add-*") -or ($_.Name -like "Get-*")} - wyswietli polecenia ktore w nazwie maja Add- lub Get-
+
+| Out-GridView - wypisze wszystko w postaci tabeli graficznej w osobnym oknie
+
+$nazwaPliku = "mojaNazwaPliku.txt"
+| Out-File $env:TEMP\$nazwaPliku - wypisze wszystko do pliku txt przypisanym wczesniej do nazwaPliku
+
+| Out-Null - polecenie przetwarza sie, ale nic dalej sie nie wykonuje (nie wypisuje)
+
+4. Zaladowywanie modulu.
+BitsTransfer - zarzadza przesylaniem danych w tle.
+Zaimportowalam modul poleceniem:
+Import-Module BitsTransfer
+alias
+ipmo BitsTransfer
+Nastepnie wylistowalam wszystkie dostepne komendy modulu.
+
+PS C:\Users\honwi> Get-Command -Module BitsTransfer
+
+CommandType     Name                                               Version    Source
+-----------     ----                                               -------    ------
+Cmdlet          Add-BitsFile                                       2.0.0.0    BitsTransfer
+Cmdlet          Complete-BitsTransfer                              2.0.0.0    BitsTransfer
+Cmdlet          Get-BitsTransfer                                   2.0.0.0    BitsTransfer
+Cmdlet          Remove-BitsTransfer                                2.0.0.0    BitsTransfer
+Cmdlet          Resume-BitsTransfer                                2.0.0.0    BitsTransfer
+Cmdlet          Set-BitsTransfer                                   2.0.0.0    BitsTransfer
+Cmdlet          Start-BitsTransfer                                 2.0.0.0    BitsTransfer
+Cmdlet          Suspend-BitsTransfer                               2.0.0.0    BitsTransfer
+
+5. Moim zadaniem jest sciagniecie obrazu maszyny wirtualnej, aby przetestowac dzialanie modulu BitsTransfer
+Za pomoca polecenia:
+Start-BitsTransfer -Source http://szuflandia.pjwstk.edu.pl/pub/repo/java/lubuntu_13_04_v02.zip -
+Destination D:\ -Credential $cred -Authentication Negotiate
+Rozpoczelo sie pobieranie pliku. Na górze terminala widnieje pasek progresu pobierania sie pliku w postaci " [ooooo     ]".
+
+Istnieje sposob na uruchomienie pobierania nie blokujac tym samym konsoli polecenieniem:
+$job = Start-BitsTransfer -Source
+http://szuflandia.pjwstk.edu.pl/pub/repo/java/lubuntu_13_04_v02.zip -Destination D:\ -Credential
+$cred -Authentication Negotiate -Asynchronous -DisplayName "Moj Bits Transfer"
+Ale wtedy nalezy uzyc takiej komendy, aby zobaczyc stan transferu:
+Get-BitsTransfer
+PS C:\Users\honwi> Get-BitsTransfer
+
+JobId                                DisplayName       TransferType JobState     OwnerAccount
+-----                                -----------       ------------ --------     ------------
+3960ef82-be31-4724-aaa7-89af246e1639 Moj Bits Transfer Download     Transferring SUNNIVA\honwi
+
+Gdy JobState bedzie Transferred, nalezy recznie ukonczyc proces poleceniem
+Complete-BitsTransfer -BitsJob $job
+Sprawdzilam, ze dopiero po napisaniu tego polecenia plik pojawil sie w folderze docelowym.
+
+6. Mierzenie czasu wykonywania sie polecenia za pomoca Measure-Command
+PS C:\Users\honwi> Measure-Command {Get-ChildItem -Path C:\Windows}
+
+Days              : 0
+Hours             : 0
+Minutes           : 0
+Seconds           : 0
+Milliseconds      : 14
+Ticks             : 145892
+TotalDays         : 1.68856481481481E-07
+TotalHours        : 4.05255555555556E-06
+TotalMinutes      : 0.000243153333333333
+TotalSeconds      : 0.0145892
+TotalMilliseconds : 14.5892
+Polecenie pokazalo w jakim czasie zostanie przetworzone polecenie listujace podana sciezke.
+
+Ponizszym poleceniem dowiadujemy sie jakie sa aliasy danego polecenia
+PS C:\Users\honwi> Get-Alias | ? {$_.Definition -like "Get-ChildItem"}
+
+CommandType     Name                                               Version    Source
+-----------     ----                                               -------    ------
+Alias           dir -> Get-ChildItem
+Alias           gci -> Get-ChildItem
+Alias           ls -> Get-ChildItem
+
+Aby wylistowac cos z odstepem czasowym mozna uzyc polecenia Sleep
+PS C:\Users\honwi> ls C:\ | %{Sleep -Milliseconds 250; return $_} | Format-Table
+Lista pojawia sie z opoznieniem 250 milisekund pomiedzy wierszami.
+
+7. Za pomocą PowerShell mozna uruchamiac inne programy. Sluzy do tego operator "call", ktory jest pod postacia znaku "&".
+& C:\Windows\notepad.exe
+Po napisaniu polecenia uruchomil sie notepad w nowym okienku.
+
+8. W PS mozna wylistowac zainstalowane aplikacje i programy na 2 sposoby.
+
+Pierwszym sposobem jest przejscie do rejestru. Nalezy sprawdzic jakie dyski mamy dostepne w PS poleceniem:
+PS C:\Users\honwi> Get-PSDrive
+
+Name           Used (GB)     Free (GB) Provider      Root                                               CurrentLocation
+----           ---------     --------- --------      ----                                               ---------------
+Alias                                  Alias
+C                  81.52         29.74 FileSystem    C:\                                                    Users\honwi
+Cert                                   Certificate   \
+D                 808.07        123.44 FileSystem    D:\
+E                  35.88        429.39 FileSystem    E:\
+Env                                    Environment
+Function                               Function
+HKCU                                   Registry      HKEY_CURRENT_USER
+HKLM                                   Registry      HKEY_LOCAL_MACHINE
+Variable                               Variable
+WSMan
+
+Tylko 2 z nich sa odpowiedzialne za rejestr: HKCU i HKLM.
+Aby wejsc do rejestru i wylistowac zawartosc nalezy uzyc polecenia cd i wylistowac zawartosc ls
+PS C:\Users\honwi> cd hklm:\
+PS HKLM:\> cd .\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall
+PS HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall> ls
+Otrzymujemy bardzo dluga liste, która mozna przefiltrowac i zmniejszyc poleceniem
+PS HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall> ls | %{ Get-ItemProperty $_.pspath | Select-Object DisplayName, InstallDate, UninstallString} | Format-Table -AutoSize
+
+9. Istnieje mozliwosc odinstalowania wszystkich aplikacji w folderze Uninstall za pomoca polecenia.
+cd HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall
+ls | %{Get-ItemProperty $_.pspath | Select-Object DisplayName, InstallDate, UninstallString} | %{& $_.UninstallString} 
+Gdzie & uruchamia odinstalowywanie calej listy.
+
+10. Drugim sposobem wylistowania wszelkich aplikacji jest WMI.
+PS C:\Users\honwi> Get-WmiObject -Class Win32_Product | Format-Table -AutoSize
+Otrzymujemy dluga liste aplikacji, a uzywajac Select-Object Name, Vendor pojawi sie okrojona lista bez zbednych informacji.
+
+Wpisujac ponizsze polecenie znajdujemy wszystkie pakiety od Microsoft.
+PS C:\Users\honwi> Get-WmiObject -Class Win32_Product | ?{$_.Vendor.toLower() -like "*microsoft*"} | Select-Object Name, Vendor | Format-Table -AutoSize
+
+Ponizszy skrypt pozwala na odinstalowanie wszystkich wylistowanych pakietow Microsoft.
+Get-WmiObject -Class Win32_Product | ?{$_.Vendor.toLower() -like "*microsoft*"} | %{ $wmiProduct = $_
+	$answer = Read-Host "Uninstall '$($wmiProduct.Name)' [y/n]"
+	$answer = $answer.ToLower()
+	switch($answer) {		"y" {
+			Write-Host -NoNewline -ForegroundColor Red "Removing: "
+			Write-Host -ForegroundColor White "$($wmiProduct.Name)"
+# # odkomentowanie poniższej lini spowoduje błąd braku uprawnień dla Twojego konta
+			$wmiProduct.Uninstall() # ta linia uruchamia deinstalację. Odkomentuj jeśli chcesz
+odinstalować wszystkie pakiety od Microsoftu. (nie polecam)			}
+			"n" {Write-Host "Ok. Skipping."}
+			default {Write-Host -ForegroundColor Red "Unexpected value. Skipping uninstalling it."}
+		}
+}
+Skrypt daje mozliwosc zaznaczania y/n przed dokonaniem deinstalacji.
+

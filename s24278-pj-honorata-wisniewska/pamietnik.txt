@@ -41,3 +41,14 @@ Zajecia pokazaly mi duzo przydatnych wskazowek, ktore usprawnia moja prace na te
 2021-11-20
 
 Zajecia sluzyly przygotowaniu do kolokwium, ktore ma sie odbyc za 2 tyg. Powtorzylismy polecenia mkdir, mv, kill, ls, grep, chmod oraz podstawy obslugi terminala.
+
+2021-12-04
+
+Na zajeciach odbylo sie kolokwium z przedmiotu. Korzystalismy z platformy kahoot, co mimo wszystko swoja wizualna otoczka uprzyjemnilo
+to stresujace wydarzenie. Pytania byly podchwytliwe, sklaniajace do myslenia i momentami wydawalo mi sie, ze minuta na odpowiedz to jednak za malo.
+Niestety presja czasu nie jest moja mocna strona, odpowiadalam za szybko, a potem bylo juz za pozno zeby poprawic swoj blad. Pomimo tego otrzymalam ocene 4, co bardzo mnie ucieszylo.
+
+2021-12-18
+
+Na dzisiejszych cwiczeniach poznalismy czym jest PowerShell. Prowadzacy przedstawil nam podstawy, wyjasnil jaka roznica jest pomiedzy uruchamianiem programu jako administrator i bez zgody administratora,
+a nastepnie wykonywalismy zadania pozwalajace na zapoznanie sie z PowerShellem. Na nastepnych zajeciach ma byc ich kontynuacja.

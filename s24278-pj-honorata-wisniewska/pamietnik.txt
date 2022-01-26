@@ -51,4 +51,15 @@ Niestety presja czasu nie jest moja mocna strona, odpowiadalam za szybko, a pote
 2021-12-18
 
 Na dzisiejszych cwiczeniach poznalismy czym jest PowerShell. Prowadzacy przedstawil nam podstawy, wyjasnil jaka roznica jest pomiedzy uruchamianiem programu jako administrator i bez zgody administratora,
-a nastepnie wykonywalismy zadania pozwalajace na zapoznanie sie z PowerShellem. Na nastepnych zajeciach ma byc ich kontynuacja.
+a nastepnie wykonywalismy zadania pozwalajace na zapoznanie sie z PowerShellem. Druga czesc zajec z PowerShell ma byc na ostatnich zajeciach.
+
+2022-01-15
+
+Dzisiejsze zajecia rozszerzyly moja wiedze na temat Gita. Prowadzacy pokazywal nam przyklady przy pomocy strony learngitbranching.js.org oraz terminala.
+Dowiedzialam sie:
+- w jaki sposob mozna zrobic merge, merge lokalny, merge poprzez GitHuba.
+- w jaki sposob zrobic revert na pull request(na stronie GitHub oraz w terminalu)
+- jak przywrocic zmiany revert w terminalu.
+- czym jest dodawanie selektywne oraz czym jest rebase.
+Dzieki cwiczeniom dowiedzialam sie wielu nowych informacji, w jaki sposob moglabym usprawnic swoja prace z gitem. Takie wprowadzenie na pewno pomoze mi w poprawnym korzystaniu z tego co git oferuje.
+

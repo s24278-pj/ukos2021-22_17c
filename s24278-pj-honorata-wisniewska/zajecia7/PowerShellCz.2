@@ -1,0 +1,87 @@
+1. Dyski w PowerShell.
+Aby wylistować dyski w PowerShell nalezy uzyć komendy:
+PS C:\Users\honwi> Get-PSDrive
+
+Name           Used (GB)     Free (GB) Provider      Root                                               CurrentLocation
+----           ---------     --------- --------      ----                                               ---------------
+Alias                                  Alias
+C                  85.17         26.10 FileSystem    C:\                                                    Users\honwi
+Cert                                   Certificate   \
+D                 812.56        118.95 FileSystem    D:\
+E                  35.91        429.36 FileSystem    E:\
+Env                                    Environment
+Function                               Function
+HKCU                                   Registry      HKEY_CURRENT_USER
+HKLM                                   Registry      HKEY_LOCAL_MACHINE
+Variable                               Variable
+WSMan				WSMan
+
+> Dyskami dajacymi dostep do rejestru są HKML i HKUC.
+> Alias jest lista wszystkich zdefiniowanych aliasów w bierzącej sesji. Tam są m.in. ls, dir, ?, %
+> Certificate to magazyn certyfikatów TLS/SSL stosowanych do szyfrowania danych. Głównie połączeń sieciowych ale też i emaili czy podpisywania danych,
+by można było sprawdzić czy treść np. dokumentu nie została zmodyfikowana. Skrypty PowerShell można podpisać cyfrowo.
+> Environment to zmienne srodowiskowe w bierzacej sesji. Przechowuja informacje o srodowisku systemu operacyjnego takie jak: sciezka systemu operacyjnego,
+liczba procesow uzywanych przez system operacyjny i lokalizacja folderow tymczasowych.
+> Function sa w niej wszystkie zdefiniowane w bierzacej sesji funkcje.
+> Variable sa to zmienne utworzone i dostępne w bierzacej sesji. Nie sa to zmienne srodowiskowe tylko zmienne lokalne.
+> WSMan - dostęp do całego systemu WMI. 
+
+Pomijajac te standardowe dyski mozna dodać inne np. GH - GitHUb, dzięki któremu można korzystać z GitHub w PowerShell, AD - ActiveDirectory,
+dysk dający dostęp do ActiveDirectory. Active Directory pozwala administratorom sieci, centralnie, z poziomu jednego komputera
+(odpowiednio skonfigurowanego serwera) zarządzać całym zbiorem użytkowników w sieci, określać ich uprawnienia do zasobów sieciowych,
+a także konfigurować komputery, na których pracują.
+
+2. Notyfikacje.
+Aby korzystac z opcji notyfikacji nalezy zaladowac odpowiednie bilioteki. 
+Stosowalam sie do podanych instrukcji.
+
+PS C:\Users\honwi> [void] [System.Reflection.Assembly]::LoadWithPartialName("System.Windows.Forms")
+>>$icoPath = Get-Process -id $pid | Select-Object -ExpandProperty Path
+>>$myNotification = New-Object System.Windows.Forms.NotifyIcon
+>>$myNotification.Icon = [System.Drawing.Icon]::ExtractAssociatedIcon($icoPath)
+>>$myNotification.BalloonTipIcon = 'Error'
+>>$myNotification.BalloonTipText = "Your cat has meowed!"
+>>$myNotification.BalloonTipTitle = "Cat Error"
+>>$myNotification.Visible = $True
+>>$myNotification.ShowBalloonTip(10000)
+
+Po uruchomieniu skryptu w notyfikacjach Windowsa pojawil sie komunikat "Cat Error. Your cat has meowed!".
+
+Aby ulatwic wysylanie notyfikacji mozna napisac funkcje:
+
+PS C:\Users\honwi> function GiveMePopup {
+>>  param(
+>>  [Parameter(Mandatory=$true)]
+>>  $Text,
+>> [Parameter(Mandatory=$true)]
+>>  $Title,
+>>
+>>  [ValidateSet('None', 'Info', 'Warning', 'Error')]
+>>  $Icon = 'Info',
+>>  $Timeout = 10000
+>>  )
+>>  [void] [System.Reflection.Assembly]::LoadWithPartialName("System.Windows.Forms")
+>>  $icoPath = Get-Process -id $pid | Select-Object -ExpandProperty Path
+>>  $myNotification = New-Object System.Windows.Forms.NotifyIcon
+>>  $myNotification.Icon = [System.Drawing.Icon]::ExtractAssociatedIcon($icoPath)
+>>  $myNotification.BalloonTipIcon = $Icon
+>>  $myNotification.BalloonTipText = $Text
+>>  $myNotification.BalloonTipTitle = $Title
+>>  $myNotification.Visible = $True
+>>  $myNotification.ShowBalloonTip(1000)
+>> }
+
+Ktora mozna wywolac poprzez:
+
+PS C:\Users\honwi> GiveMePopup -Text "Your cat has meowed!" -Title "Cat Error" -Icon Error
+
+Lub w petli(wyswietli 10 powiadomien)
+
+PS C:\Users\honwi> For($i = 1; $i -le 10; $i++) {
+>> GiveMePopup -Text "WTF-second passed!" -Title "WTF Notification" -Icon Info
+>> }
+PS C:\Users\honwi>
+
+Notyfikacja moze miec maksymalnie do 4 wierszy.
+PS C:\Users\honwi> GiveMePopup -Text "Pierwszy wiersz`nDrugi wiersz`nTrzeci wiersz`nCzwarty wiersz" -Title "Dluga
+>> informacja" -Icon Info
